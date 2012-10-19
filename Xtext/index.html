@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Xtext - DSL unleashed</title>
+
+		<meta name="description" content="A short introduction to Xtext">
+		<meta name="author" content="Martin Reinhardt">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/theme/default.css">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<script>
+			// If the query includes 'print-pdf' we'll use the PDF print sheet
+			document.write('<link rel="stylesheet" href="css/print/' + (window.location.search.match(/print-pdf/gi) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">');
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+					<h1>Xtext</h1>
+					<h2>Xtext - DSL unleashed</h2>
+					<h3>Martin Reinhardt</h3>
+				</section>
+				<section>
+					<h2>Agenda</h2>
+					<br/>
+					<ul style="display: block; ">
+						<li>
+							<h3>Basics</h3>
+						</li>
+						<li>
+							<h3>Why should I use Xtext</h3>
+						</li>
+						<li>
+							<h3>Structuring your DSL</h3>
+						</li>
+						<li>
+							<h3>Code Generation</h3>
+						</li>
+						<li>
+							<h3>Testing</h3>
+						</li>
+						<li>
+							<h3>Continous Integration</h3>
+						</li>
+						<li>
+							<h3>Whats left?</h3>
+						</li>
+						<li>
+							<h3>Problems</h3>
+						</li>
+						<li>
+							<h3>Links</h3>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Xtext</h2>
+					<div class="fragment">
+						Xtext is a language development framework i.e., a technology supporting the activity of developing languages, so called Domain Specific Languages.
+						<img src="img/Xtext_components.png"/>
+					</div>
+				</section>
+
+				<section>
+					<h2>Xtext features</h2>
+
+					<div class="fragment">
+						<ul style="display: block; ">
+							<li>
+								Or why to use Xtext?
+							</li>
+						</ul>
+
+						<div class="fragment">
+							<img src="img/Xtext_features.png"/>
+						</div>
+					</div>
+				</section>
+				<section>
+					<section>
+						<h2>Structuring your DSL</h2>
+						<br/>
+						<ul style="display: block; ">
+							<li>
+								Why a DSL?
+							</li>
+							<li>
+								worthwhile if the language allows a particular type of problem, the language fits to solve a particular problem
+							</li>
+						</ul>
+						<ul class="fragment" style="display: block; ">
+							<li>
+								Domain Specific Languages (DSL) have been hard sells in past
+							</li>
+							<li>
+								The most common objection is to the presumed effort required to create a DSL. Few have experience writing a language and those that do typically wrote languages some time ago.
+
+							</li>
+
+							<div class="fragment">
+								<li>
+									With today’s tools though, writing a DSL is much easier, no need to build up on parser, lexer .. (know yacc/bison)
+								</li>
+								<li>
+									But how?
+								</li>
+							</div>
+						</ul>
+					</section>
+					<section>
+						<h2>Designing a DSL with XText</h2>
+						<br/>
+						<ul style="display: block; ">
+							<li>
+								Xtext delivers got defaults, but the more you want the more you pay
+							</li>
+							<li>
+								Uses ANTLr for lexer and parser generation (well proven, but check your grammar for left-recursion)
+							</li>
+							<li>
+								if you are fine with the (reasonable) defaults, your amount of work will be pretty low
+							</li>
+							<li>
+								otherwise, Xtext is highly configurable
+							</li>
+							<li>
+								Xtext is based on Ecore, so Knowledge of Ecore is required to exploit Xtext’s full potential
+							</li>
+							<li>
+								EMF is “a modeling framework and code generation facility for building tools and other applications based on a structured data model”
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h2>XText Grammar</h2>
+						<ul style="display: block; ">
+							<li>
+								grammar language (XGL) describe (textual) languages, looks a bit like EBNF
+							</li>
+							<ul>
+								<li>
+									the syntax of the target language
+								</li>
+								<li>
+									structure of the target AST
+									<pre style="font-size:16px;"><code class="javascript">terminal NAME : expression ;</code></pre>
+								</li>
+							</ul>
+						</ul>
+						<ul style="display: block; ">
+							<li>
+								expression can contain
+							</li>
+							<ul style="display: block; ">
+								<li>
+									keywords
+									<pre style="font-size:16px;"><code class="javascript">EX: 'foo', "\foo", '"', "'"</code></pre>
+								</li>
+								<li>
+									wildcard
+									<pre style="font-size:16px;"><code class="javascript">EX: . </code></pre>
+								</li>
+								<li>
+									rule calls (can only point to other terminal rules)
+									<pre style="font-size:16px;"><code class="javascript">EX: ID </code></pre>
+								</li>
+								<li>
+									character ranges
+									<pre style="font-size:16px;"><code class="javascript">EX: 'a'..'z', 'A'..'Z', '0'..'9'</code></pre>
+								</li>
+							</ul>
+						</ul>
+					</section>
+					<section>
+						<ul style="display: block; ">
+							<ul style="display: block; ">
+								<li>
+									until token (useful for comments)
+									<pre style="font-size:16px;"><code class="javascript">EX: '/*' -> '*/'</code></pre>
+								</li>
+								<li>
+									negated token
+									<pre style="font-size:16px;"><code class="javascript">EX: !'a'		
+ </code></pre>
+								</li>
+								<li>
+									cardinality operators (?, *, + or nothing)
+									<pre style="font-size:16px;"><code class="javascript">EX: '^'?, '\n'*, 'a'+
+ </code></pre>
+								</li>
+								<li>
+									groups (token sequences)
+									<pre style="font-size:16px;"><code class="javascript">EX: 'a' . ID </code></pre>
+								</li>
+								<li>
+									alternatives
+									<pre style="font-size:16px;"><code class="javascript">EX: ' ' | '\t' | '\r' | '\n' </code></pre>
+								</li>
+							</ul>
+							<li>
+								Terminal rules can hide each other, take care of the order !
+							</li>
+
+							<li>
+								Especially import when mixing grammars!
+							</li>
+						</ul>
+					</section>
+					<section>
+						<ul style="display: block; ">
+							<li>
+								Parser Rules
+							</li>
+							<ul style="display: block; ">
+								<li>
+									keywords
+								</li>
+								<li>
+									rule calls
+								</li>
+								<li>
+									groups
+								</li>
+								<li>
+									cardinality operators
+								</li>
+								<li>
+									character ranges
+								</li>
+
+								<li>
+									alternatives
+								</li>
+								<li>
+									unordered groups (Elements can appear in any order but only once, Elements with cardinality * or + must appear continuously without interruption
+									)
+									<pre style="font-size:16px;"><code class="javascript">EX: 'a' & ID*</code></pre>
+								</li>
+							</ul>
+						</ul>
+					</section>
+					<section>
+						<ul style="display: block; ">
+							<li>
+								You have to know your AST before defining the textual representation
+							</li>
+							<li>
+								Can use mindmap to structure your grammar before writing Xtext grammar
+							</li>
+							<li>
+								Start with less functionality and add feature by feature
+							</li>
+							<ul style="display: block; ">
+								<li>
+									Keep in mind besides the grammar there are the code generation, syntax highlighting ...
+								</li>
+								<li>
+									Smaller Steps are easier to cover all components
+								</li>
+								<li>
+									Also think about grammar splitting to split up to work between team members
+								</li>
+							</ul>
+
+							<div class="fragment">
+								<li>
+									Too much theory?
+								</li>
+							</div>
+							<div class="fragment">
+								<li>
+									Let's go a bit more practical with an example
+								</li>
+							</div>
+						</ul>
+					</section>
+					<section>
+						<pre style="font-size:16px;"><code class="javascript">grammar org.example.domainmodel.Domainmodel with
+                                      org.eclipse.xtext.common.Terminals
+ 
+generate domainmodel "http://www.example.org/domainmodel/Domainmodel"
+ 
+Domainmodel :
+  elements += Type*
+;
+  
+Type:
+  DataType | Entity
+;
+  
+DataType:
+  'datatype' name = ID
+;
+ 
+Entity:
+  'entity' name = ID ('extends' superType = [Entity])? '{'
+     features += Feature*
+  '}'
+;
+ 
+Feature:
+  many?='many'? name = ID ':' type = [Type]
+;</code></pre>																																										
+
+
+
+
+
+
+
+
+						<ul style="display: block; ">
+							<div class="fragment">
+								<li>
+									Not that good practical sample?
+								</li>
+							</div>
+						</ul>
+					</section>
+
+					<section>
+						<ul style="display: block; ">
+							<div class="fragment">
+								<li>
+									How would I describe an UI with Xtext?
+								</li>
+							</div>
+						</ul>
+						<div class="fragment">
+							<pre style="font-size:14px;"><code class="java">...
+WebAppSetup:
+'webapp' (name=ID)? '{'		
+	(global=Global)?
+	(pages+=Page)+ 
+	('actions' definedGlobalAction+=ActionElement)*
+'}';
+	
+Page:
+'page' name=ID ('path' path=STRING)?	'{'
+	('input' input+=InputElement (','input+=InputElement)*)?
+	('view' view+=ViewElement (','view+=ViewElement)*)?	
+	('action' action+=ActionElement (','action+=ActionElement)*)?
+'}';
+	
+Global:
+'global' '{'
+	('loaderElement' loader=Loader)?		
+	('input' definedGlobalInputs+=InputElement (','definedGlobalInputs+=InputElement)*)?
+	('view' definedGlobalViews+=ViewElement (','definedGlobalViews+=ViewElement)*)?	
+	('action' definedGlobalActions+=ActionElement (','definedGlobalActions+=ActionElement)*)?
+'}';
+		
+Loader: view=ViewElement;
+
+ViewElement: type=ViewType name=ID 'selector =' selector=Selector ;
+
+enum ViewType: ELEMENT ='element';
+
+ActionElement: type=ActionType name=ID 'selector =' selector=Selector ;
+			
+enum ActionType: CLICK = 'click' ;
+
+terminal ID: '^'?('a'..'z'|'A'..'Z'|'_'|':') ('a'..'z'|'-'|'A'..'Z'|'_'|'0'..'9'|':')*;
+
+terminal INT returns ecore::EInt: ('-')?('0'..'9')+;
+...	</code></pre>
+							<ul style="display: block; ">
+								<li>
+									Let's start with a demo
+								</li>
+							</ul>
+
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Code generation</h2>
+						<br/>
+						<ul class="fragment" style="display: block; ">
+							<li>
+								Xtend is used to generate code within Xtext, compiles to Java
+							</li>
+							<div class="fragment">
+								<li>
+									Via JvmTypeReference
+									<ul class="fragment" style="display: block; ">
+										<li>
+											Good usage to generate Java classes, more robust when refactoring grammar, e.g. type safety
+										</li>
+										<li>
+											Litte bit more complex and doesn't support other languages, e.g. for generating text files
+										</li>
+									</ul>
+								</li>
+							</div>
+							<div class="fragment">
+								<li>
+									Via IGenerator
+									<ul class="fragment" style="display: block; ">
+										<li>
+											Litte easier to learn
+										</li>
+										<li>
+											No type safety
+										</li>
+										<li>
+											Generic approach, e.g. for generating text files
+										</li>
+									</ul>
+								</li>
+							</div>
+						</ul>
+					</section>
+
+					<section>
+						<div class="fragment" >
+							<h2>Good Practise</h2>
+							<ul class="fragment" style="display: block; ">
+								<li>
+									Split up generator via extension in Xtend 									<pre><code style="java">class MyGenerator implements IGenerator {
+	
+	//add extension 
+	@Inject extension anotherGenerator
+	..
+}</code></pre>
+									
+
+
+
+								</li>
+								<li>
+									As in Java add debug information, can use normal Java Logger
+								</li>
+								<li>
+									Use Xtend Generator for text generation (much easier as in Java)
+								</li>
+								<li>
+									Use Helper methods for common naming etc.
+								</li>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<div class="fragment" >
+							<h2>Example - IGenerator</h2>
+							<ul class="fragment" style="display: block; ">
+								<li>
+									Split up generator via extension in Xtend 									<pre><code style="java">class MyDslGenerator implements IGenerator {
+ 
+ override void doGenerate(Resource resource, IFileSystemAccess fsa) {
+  fsa.generateFile(resource.className+".java", toJavaCode(resource.contents.head as Statemachine))
+ }
+ 
+ def className(Resource res) {
+  var name = res.URI.lastSegment
+  name.substring(0, name.indexOf('.'))
+ }
+ 
+ def toJavaCode(Statemachine sm) '''
+ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+ 
+ public class «sm.eResource.className» {
+  
+  public static void main(String[] args) {
+   new «sm.eResource.className»().run();
+  }
+  ...
+}</code></pre>
+							</ul>
+						</div>
+					</section>
+					<section>
+						<div class="fragment" >
+							<h2>Example - JvmTypeReference</h2>
+							<ul class="fragment" style="display: block; ">
+								<li>
+									Split up generator via extension in Xtend 									<pre style="font-size:12px;"><code style="java"> def dispatch void infer(Statemachine stm, 
+                         IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   
+   // create exactly one Java class per state machine
+   acceptor.accept(stm.toClass(stm.className)).initializeLater [
+     
+     // add a field for each service annotated with @Inject
+     members += stm.services.map[service|
+       service.toField(service.name, service.type) [
+         annotations += service.toAnnotation(typeof(Inject))
+       ]
+     ]
+     
+     // generate a method for each state having an action block
+     members += stm.states.filter[action!=null].map[state|
+       state.toMethod('do'+state.name.toFirstUpper, state.newTypeRef(Void::TYPE)) [
+         visibility = PROTECTED
+         
+         // Associate the expression with the body of this method.
+         body = state.action
+       ]
+     ]
+     
+     // generate a method containing the actual state machine code
+     members += stm.toMethod("run", newTypeRef(Void::TYPE)) [
+       
+       // the run method has one parameter : an event source of type Provider 
+       val eventProvider = stm.newTypeRef(typeof(Provider), stm.newTypeRef(typeof(String)))
+       parameters += stm.toParameter("eventSource", eventProvider)
+       
+       // generate the body
+       body = [append('''
+         boolean executeActions = true;
+  ...
+}</code></pre>
+							</ul>
+						</div>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Testing with Xtext</h2>
+						<ul class="fragment" style="display: block; ">
+							<li>
+								Native support for JUnit
+							</li>
+							<li>
+								Most of the tests can run headless
+							</li>
+							<li>
+								Can use Xtext Junit helper classes, e.g. for parametrized tests
+							</li>
+							<li>
+								integration test get really complex
+							</li>
+							<li>
+								But to to test the editor you should use tools like SWT-Bot
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Testing examples</h2>
+						<pre style="font-size:12px;"><code style="java">@RunWith(XtextRunner.class)
+@InjectWith(AppSetupInjectorProvider.class)
+public class WebAppSetupModelTest {
+
+  @Inject
+  ParseHelper<WebAppSetup> parseHelper;
+
+  /**
+   * Empty models should result in a null model
+   */
+  @Test
+  public void testEmptyModel() throws Exception {
+    StringBuilder modelString = new StringBuilder();
+    modelString.append("");
+    WebAppSetup model = parseHelper.parse(modelString);
+    assertNull("Model is not empty", model);
+
+  }
+
+  @Test
+  public void testModelAccept() throws Exception {
+    StringBuilder modelString = new StringBuilder();
+    modelString.append("webapp ea { ");
+    modelString.append("    global {");
+    modelString.append("        loaderElement element loader selector = #ajax-loader");
+    modelString.append("        action click next selector = #gotoNext");
+    modelString.append("    }");
+    modelString.append("");
+    modelString.append("    page login path \"/faces/pages/login/login.xhtml\" {");
+    modelString.append("    input type user  selector = #login_input,");
+    modelString.append("    type password selector = #password  ");
+    modelString.append("    action click login selector = #login_submit  ");
+    modelString.append("    }");
+    modelString.append("}");
+    WebAppSetup model = parseHelper.parse(modelString);
+    assertNotNull("Model is null. ", model);
+    assertTrue("Expected 'loader' as name for global loader element, but was "
+        + model.getGlobal().getLoader().getView().getName(),
+        model.getGlobal().getLoader().getView().getName().equalsIgnoreCase("loader"));
+    assertTrue("Expected only one page, but was " + model.getPages().size(), model.getPages().size() == 1);
+
+  }
+
+}</code></pre>
+					</section>
+					<section>
+						<h2>Future of testing with Xtext</h2>
+						<ul class="fragment" style="display: block; ">
+							<li>
+								better support for file handling for comparing <a target="_blank"  href="http://de.slideshare.net/meysholdt/testdriven-development-of-xtext-dsls">generator artifacts</a>
+							</li>
+							<li>
+								More tools for easier <a target="_blank"  href="http://code.google.com/a/eclipselabs.org/p/xtext-utils/wiki/Unit_Testing">unittesting</a>
+							</li>
+
+						</ul>
+
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Continous Integration</h2>
+						<ul style="display: block; ">
+
+							<li>
+								How build Eclipse on a continous integration plattform?
+								<div class="fragment" >
+									By using Maven/Tycho
+								</div>
+							</li>
+							<div class="fragment" >
+								<li>
+									the whole eclipse plugin stuff gives you lot of maven projects, e.g. for the folder structure
+									<pre><code>docs
+examples
+ ->sample
+features
+ ->org.xtext.feature
+releng
+ ->org.xtext.parent
+ ->org.xtext.product
+ ->org.xtext.repository
+ ->org.xtext.repository.parent
+ ->org.xtext.targetplattform
+ ->org.xtext.updatesite
+plugins
+ ->org.xtext.mysql1
+ ->org.xtext.mydsl1.ui
+ ->org.xtext.mysql2
+ ->org.xtext.mydsl2.ui
+tests
+ ->org.xtext.mydsl1.tests
+ ->org.xtext.mydsl2.tests</code></pre>
+								</li>
+							</div>
+						</ul>
+					</section>
+
+					<section>
+						<h3> Steps to successfull Maven build</h3>
+						<ul style="display: block; ">
+
+							<li>
+								Move projects to the appropiate folders
+							</li>
+							<li>
+								Add Parent-, Repository and Target-Plattform Maven-Projects
+							</li>
+							<li>
+								Create Feature Plugin with in eclipse
+							</li>
+							<li>
+								Create Product Plugin with in eclipse
+							</li>
+							<li>
+								More details on the <a target="_blank" href="http://kekz-box.de/wiki/index.php/Xtext#Maven.2FTycho">wiki</a>
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Setting up a RCP product for a Xtext DSL</h3>
+						<ul style="display: block; ">
+
+							<li>
+								Create a Plugin Project for your product (PlugIn-Project in Eclipse)
+							</li>
+							<li>
+								Create a Feature Project for your DSL  (Feature-Project in Eclipse)
+							</li>
+							<li>
+								Create a Feature Project for your DSL-SDK  (Feature-Project in Eclipse)
+							</li>
+							<li>
+								Create a Feature Project for your DSL-Tests  (Feature-Project in Eclipse)
+							</li>
+							<li>
+								Create the Product Configuration (see first step and add the needed plugins)
+							</li>
+
+							<div class="fragment" >
+								<li>
+									What about an example?
+								</li>
+							</div>
+						</ul>
+					</section>
+
+					<section>
+						<h3> Configure your build Job</h3>
+						<ul style="display: block; ">
+							<li>
+								Build repository project in pre-buildstep
+							</li>
+							<li>
+								Add Maven buildstep for the parent-pom and just do a 'mvn clean install'
+							</li>
+							<li>
+								See sample job on <a target="_bblank" href="https://hypery2k.ci.cloudbees.com/job/Xtext%20Maven%20Sample">CloudBees</a>
+							</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<h2>Further topics</h2>
+					<ul style="display: block; ">
+						<li>
+							Formatting (Syntax-Highlighting, Indentention), Quickfixes, Refactoring ...
+						</li>
+						<li>
+							Learn about Developing Eclipse Plugins
+						</li>
+						<li>
+							Also keep in mind to setup a project wizard for the final plugin
+						</li>
+						<li>
+							Xtext isn't the only DSL-Toolset, see Groovy, Spoofax ...
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Problems</h2>
+					<br>
+					<ul style="display: block; ">
+						<li>
+							Xtext allows to really start fast with DSL-development
+						</li>
+						<div class="fragment">
+						<li>
+							but the more you want ...
+						</li>
+						<div>
+						</div>
+						<li>
+							The further configuration of the Editor
+						</li>
+						<li>
+							Maven/Tycho build, no real support for dependency management
+						</li>
+						<li>
+							testing support could be improved
+						</li>
+						</div>
+					</ul>
+				</section>
+				<section>
+					<h2>Links</h2>
+					<br>
+					<ul style="display: block; ">
+						<li>
+							<a target="_blank" href="http://kekz-box.de/wiki/index.php/Xtext">Xtext-Wiki </a>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.delicious.com//HyperY2K/Xtext">Xtext-Links</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.eclipse.org/Xtext/documentation.html">Xtext Documentation</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.eclipse.org/Xtext/7languages.html">Xtext examples</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://it-republik.de/jaxenter/artikel/Eclipse-RCP-Anwendungen-mit-Maven-und-Tycho-bauen-4156.html">Artikel zu Maven/Tycho</a>
+						</li>
+						<li>
+							<a target="_blank" href="https://github.com/hypery2k/Xtext-Maven-BuildExample">Xtext Maven/Tycho example</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://code.google.com/a/eclipselabs.org/p/spray/">Spray - practical Xtext OSS project</a>
+						</li>
+					</ul>
+				</section>
+
+				<section>
+					<h1>THE END</h1>
+
+					<h3>BY Martin Reinhardt
+					<br/>
+					<a target="_blank" href="https://github.com/hypery2k">github</a></h3>
+				</section>
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Presentation progress bar -->
+			<div class="progress">
+				<span></span>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+controls: true,
+progress: true,
+history: true,
+
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/linear(2d)
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+{ src: 'lib/js/highlight.js', async: true, callback: function() { window.hljs.initHighlightingOnLoad(); } },
+{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+{ src: 'lib/js/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+{ src: 'lib/js/data-markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+{ src: 'socket.io/socket.io.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+{ src: 'plugin/speakernotes/client.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+]
+});
+
+		</script>
+
+	</body>
+</html>
